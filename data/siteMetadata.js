@@ -8,8 +8,8 @@ const siteMetadata = {
   theme: 'system', // system, dark or light
   siteUrl: 'https://www.univ-lyon2.fr/master-2-informatique-organisation-et-protection-des-systemes-dinformation-dans-les-entreprises-opsie',
   siteRepo: 'https://github.com/M2-OPSIE/cyberopsie',
-  siteLogo: `${process.env.BASE_PATH || ''}/static/images/dis.png`,
-  socialBanner: `${process.env.BASE_PATH || ''}/static/images/dis.png`,
+  siteLogo: `${process.env.BASE_PATH || ''}/static/images/opsie.png`,
+  socialBanner: `${process.env.BASE_PATH || ''}/static/images/opsie.png`,
   github: 'https://github.com/M2-OPSIE/',
   locale: 'fr-FR',
   // set to true if you want a navbar fixed to the top
