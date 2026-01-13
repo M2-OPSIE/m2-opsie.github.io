@@ -1,0 +1,82 @@
+---
+title: Nsharp – Un scanner réseau visuel avec analyse intelligente
+date: '2026-01-10'
+tags: ['sécurité', 'scanner réseau', 'audit', 'IA', 'outils']
+draft: false
+summary: Présentation de Nsharp, un outil de scan réseau avec interface graphique et analyse intelligente des ports ouverts.
+---
+
+Dans le domaine de la cybersécurité, les outils de scan réseau sont indispensables pour comprendre l'exposition d'un système. C'est dans cette optique qu'a été conçu **Nsharp**, un outil orienté **simplicité et accessibilité**, tout en conservant une logique proche des outils professionnels.
+
+## Objectifs
+
+Nsharp rend l'analyse réseau plus accessible grâce à une **interface graphique claire**, une **visualisation immédiate des résultats** et une **explication contextualisée des ports ouverts**. L'objectif est d'aider l'utilisateur à **comprendre les risques** identifiés.
+
+## Fonctionnalités principales
+
+### Scanner réseau intuitif
+
+Le moteur de scan identifie les ports ouverts via une interface simple : saisie de la cible, options à cocher, etc...
+
+### Analyse intelligente par IA
+
+L'un des points forts est l'**analyse assistée par intelligence artificielle** qui fournit pour chaque port détecté des pistes d'exploitation.
+
+L'outil agit ainsi comme un **assistant analyste** contextualisant les résultats.
+
+> **Note** : L'analyse IA nécessite une clé API de [ChatAnywhere](https://github.com/chatanywhere/GPT_API_free) à configurer dans les préférences de l'application. Cette solution est **entièrement gratuite**, évitant ainsi de devoir payer pour une clé API chez OpenAI, Mistral, Google ou d'autres fournisseurs.
+
+### Export PDF et historique
+
+Les résultats peuvent être **exportés en PDF** pour archivage ou partage. De plus, chaque scan est automatiquement sauvegardé localement, permettant de consulter l'historique et comparer les analyses dans le temps.
+
+### Fonctionnalités complémentaires
+
+- **Estimation du système d'exploitation** de la cible basée sur l'observation des ports
+- **Gestion des préférences** : configuration de l'IA et paramètres stockés localement
+- Interface conçue pour améliorer l'expérience utilisateur
+
+## Utilisation
+
+### Installation
+
+**Prérequis** : .NET 8.0 SDK ou Docker
+
+**Avec Docker (recommandé)** :
+
+```bash
+docker build -t nsharp .
+docker run -p 8080:8080 nsharp
+```
+
+Pour un accès réseau complet (scan LAN) :
+
+```bash
+docker run --network host nsharp
+```
+
+**Avec dotnet CLI** :
+
+```bash
+git clone https://github.com/aymene69/Nsharp.git
+cd Nsharp
+dotnet run
+```
+
+L'application sera accessible sur `http://localhost:8080` (Docker) ou `http://localhost:5224` (dotnet).
+
+### Exemple d'utilisation
+
+**Scan basique** : Saisissez une IP ou un nom de domaine, puis lancez le scan. L'outil détecte automatiquement les ports ouverts et affiche les services associés.
+
+![Résultats d'un scan sans IA](https://i.imgur.com/3eK98SG.png)
+
+**Scan avec analyse IA** : En activant l'option d'analyse intelligente, Nsharp fournit des pistes d'exploitation pour chaque port détecté. Par exemple, pour un port SSH ouvert, l'outil suggère l'utilisation de `nmap -sV -sC` avec les scripts `ssh2-enum-algos` et `ssh-auth-methods`, ou encore le test de force brute avec `hydra -l root -P wordlist.txt`.
+
+![Résultats avec analyse IA](https://i.imgur.com/8kC2l8X.png)
+
+Pour plus de détails sur le projet, consultez le [dépôt GitHub de Nsharp](https://github.com/aymene69/Nsharp).
+
+---
+
+_A. BELMEGUENAI, I. MACHANE_
