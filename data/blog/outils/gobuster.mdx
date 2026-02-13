@@ -1,0 +1,229 @@
+---
+title: Gobuster – L'outil de brute-force pour la découverte web
+date: '2026-02-06'
+tags: ['sécurité', 'web', 'reconnaissance', 'enumeration', 'outils', 'brute-force', 'pentest']
+draft: false
+summary: Présentation de Gobuster, un outil open source de brute-force pour découvrir des répertoires, fichiers et sous-domaines cachés.
+---
+
+## Introduction
+
+### Qu'est-ce que Gobuster ?
+
+Gobuster est un outil de **brute-force** écrit en Go, spécialisé dans la découverte de :
+
+- **URIs** (répertoires et fichiers cachés)
+- **Sous-domaines DNS**
+- **Virtual Hosts (VHosts)**
+
+Il est devenu l'outil de référence pour la phase de **reconnaissance** lors de pentests, missions Red Team et CTF.
+
+### L'atout majeur : Vitesse et légèreté
+
+Gobuster tire sa puissance du langage **Go** :
+
+| Avantage                  | Description                                                                           |
+| ------------------------- | ------------------------------------------------------------------------------------- |
+| **Multi-threading natif** | Go gère les goroutines efficacement, permettant des centaines de requêtes simultanées |
+| **Binaire compilé**       | Pas besoin d'interpréteur Python/Java, exécution directe                              |
+| **Légèreté**              | Pas d'interface graphique lourde, 100% ligne de commande                              |
+| **Portabilité**           | Un seul binaire, fonctionne partout                                                   |
+
+### Comparatif : Gobuster vs les anciens outils
+
+| Critère             | Dirb           | DirBuster      | Gobuster               |
+| ------------------- | -------------- | -------------- | ---------------------- |
+| **Langage**         | C              | Java           | Go                     |
+| **Vitesse**         | Lent           | Moyen          | Très rapide            |
+| **Interface**       | CLI            | GUI            | CLI                    |
+| **Modes**           | DIR uniquement | DIR uniquement | DIR, DNS, VHOST, S3... |
+| **Maintenance**     | Abandonné      | Abandonné      | Active                 |
+| **Multi-threading** | Limité         | Oui            | Excellant              |
+
+**Verdict** : Gobuster a supplanté les outils Python/Java grâce à sa vitesse, sa polyvalence et sa maintenance active.
+
+## Installation
+
+### Via les paquets (Kali/Debian)
+
+De base, les machines Kali ou Exegol ont déjà Gobuster installé.
+
+La méthode la plus simple sur Kali Linux ou Debian :
+
+```bash
+sudo apt update
+sudo apt install Gobuster
+```
+
+## Les 3 modes indispensables
+
+### Mode **DIR** : Découverte de répertoires et fichiers à partir d'une wordlist.
+
+Le mode le plus utilié. Il permet de trouver des ressources cachées comme /admin, /backup, config.php.
+
+**Syntaxe de base** :
+
+```bash
+gobuster dir -u <URL> -w WORDLIST>
+```
+
+**Exemple concret** :
+
+```bash
+gobuster dir -u http://target.com -w /usr/share/wordlists/dirb/common.txt
+```
+
+**Résultat typique** :
+
+```
+===============================================================
+Gobuster v3.6
+===============================================================
+[+] Url:                     http://target.com
+[+] Wordlist:                /usr/share/wordlists/dirb/common.txt
+===============================================================
+/.htaccess            (Status: 403) [Size: 276]
+/admin                (Status: 301) [Size: 310] [--> http://target.com/admin/]
+/backup               (Status: 200) [Size: 1024]
+/login                (Status: 200) [Size: 2048]
+===============================================================
+```
+
+### Mode **DNS** : Découverte de sous-domaines
+
+Permet de trouver des sous-domaines comme dev.site.com, mail.site.com, etc.
+
+**Syntaxe de base** :
+
+```bash
+gobuster dns -d <DOMAINE> -w <WORDLIST>
+```
+
+**Exemple concret** :
+
+```bash
+gobuster dns -d target.com -w /usr/share/seclists/Discovery/DNS/subdomains-top1million-5000.txt
+```
+
+**Résultat typique** :
+
+```
+===============================================================
+Gobuster v3.6
+===============================================================
+[+] Domain:     target.com
+===============================================================
+Found: www.target.com
+Found: mail.target.com
+Found: dev.target.com
+Found: api.target.com
+===============================================================
+```
+
+### Mode **VHOST** : Virtual Hosts
+
+Crucial pour les CTF (HackTheBox, TryHackMe) quand le DNS n'est pas public. Ce mode teste les virtual hosts en modifiant l'en-tête Host.
+
+**Syntaxe de base** :
+
+```bash
+gobuster vhost -u <URL> -w <WORDLIST>
+```
+
+**Exemple concret** :
+
+````bash
+gobuster vhost -u http://10.10.10.10 -w /usr/share/seclists/Discovery/DNS/subdomains-top1million-5000.txt```
+````
+
+**Résultat typique** :
+
+```
+===============================================================
+Gobuster v3.6
+===============================================================
+[+] Url:          http://10.10.10.10
+===============================================================
+Found: admin.target.htb (Status: 200) [Size: 1234]
+Found: dev.target.htb (Status: 200) [Size: 5678]
+===============================================================
+```
+
+### Les options avancées
+
+#### Extensions (-x)
+
+Chercher spécifiquement des types de fichiers :
+
+```bash
+gobuster dir -u http://target.com -w wordlist.txt -x php,txt,bak,sql,zip
+```
+
+| Extension | Intérêt                                    |
+| --------- | ------------------------------------------ |
+| .php      | Scripts serveur (fichiers de config, etc.) |
+| .txt      | Notes, flags, robots                       |
+| .bak      | Fichiers de backup                         |
+| .sql      | Dumps base de données                      |
+| .zip      | Archives compressées                       |
+| .old      | Anciennes versions                         |
+
+#### Vitesse (-t)
+
+Augmenter le nombre de threads pour accélérer le scan :
+
+```bash
+# 10 threads par défaut
+gobuster dir -u http://target.com -w wordlist.txt -t 50
+```
+
+⚠️ Attention : Trop de threads peuvent faire tomber le serveur ou déclencher un WAF !
+
+#### Filtrage des codes HTTP
+
+Masquer certains codes (-b) :
+
+```bash
+# Ignorer les 404 et 403
+gobuster dir -u http://target.com -w wordlist.txt -b 404,403
+```
+
+Afficher uniquement certains codes (-s) :
+
+```bash
+# Ne montrer que les 200 et 301
+gobuster dir -u http://target.com -w wordlist.txt -s 200,301
+```
+
+Pour une phase de reconnaissance réussie, nous vous conseillons d'installer les wordlists de SecLists.
+
+```bash
+sudo apt install seclists
+```
+
+## Conclusion
+
+Gobuster est un outil incontournable de la phase de reconnaissance. Sa vitesse, sa polyvalence (DIR, DNS, VHOST) et sa simplicité en font le choix numéro un pour les pentesters et les joueurs de CTF.
+
+### ⚠️ Disclaimer légal
+
+> **Attention** : L'utilisation de Gobuster sur des systèmes sans autorisation explicite est **illégale** et peut entraîner des poursuites judiciaires.
+>
+> Utilisez cet outil uniquement dans un cadre légal :
+>
+> - **Pentests autorisés** avec un contrat signé
+> - **Bug bounty** sur des programmes officiels
+> - **CTF et labs** (HackTheBox, TryHackMe, etc.)
+> - **Environnements personnels** que vous possédez
+>
+> Le scan de sites web sans permission constitue une intrusion informatique au sens de l'article 323-1 du Code pénal français.
+
+## Pour aller plus loin
+
+- [Documentation officielle](https://github.com/OJ/gobuster)
+- [SecLists - Collection de wordlists](https://github.com/danielmiessler/SecLists)
+- [Alternative : ffuf](https://github.com/ffuf/ffuf)
+
+---
+
+_R. GAGNAIRE, C. LORTEAU_
