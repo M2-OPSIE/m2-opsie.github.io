@@ -1,0 +1,220 @@
+---
+title: Volatility – L'outil d'analyse mémoire pour le forensic
+date: '2026-02-06'
+tags: ['sécurité', 'analyse mémoire', 'RAM', 'forensic', 'outils']
+draft: false
+summary: Présentation de Volatility, un outil open source d'analyse de dumps mémoire RAM, illustré par un exemple dans un CTF.
+---
+
+## Introduction
+
+[Volatility](https://github.com/volatilityfoundation/volatility3) est un framework open source d'analyse forensique de la mémoire RAM. Il permet d'extraire des informations précieuses à partir de dumps mémoire : processus en cours, connexions réseau, fichiers ouverts, clés de registre, mots de passe en clair, malwares, etc.
+
+### Pourquoi analyser la RAM ?
+
+La mémoire vive contient des données volatiles qui disparaissent à l'extinction de la machine :
+
+- **Processus actifs** et leurs arguments
+- **Connexions réseau** établies
+- **Clés de chiffrement** temporaires
+- **Historique des commandes**
+- **Malwares fileless** (sans fichier sur disque)
+
+## Comment fonctionne un dump mémoire ?
+
+Un dump mémoire est une **copie bit à bit** du contenu de la RAM à un instant T. Cette capture permet de "figer" l'état de la mémoire pour l'analyser ultérieurement.
+
+### Dans quel contexte utiliser Volatility ?
+
+L'analyse de dumps mémoire avec Volatility est particulièrement utile dans les situations suivantes :
+
+| Contexte                     | Objectif                                                                 |
+| ---------------------------- | ------------------------------------------------------------------------ |
+| **Réponse à incident**       | Identifier un malware, comprendre la compromission, extraire les IOCs    |
+| **Investigation forensique** | Reconstituer les actions d'un attaquant, prouver une intrusion           |
+| **Analyse de malware**       | Étudier le comportement d'un malware en mémoire (injection, persistence) |
+| **CTF / Challenges**         | Résoudre des épreuves forensiques en extrayant des données cachées       |
+| **Audit de sécurité**        | Vérifier les processus actifs, détecter des anomalies                    |
+| **Récupération de données**  | Extraire des mots de passe, clés de chiffrement, fichiers en mémoire     |
+
+#### Exemples concrets d'utilisation
+
+- **Détection de ransomware** : Identifier le processus malveillant et extraire la clé de chiffrement avant qu'elle ne soit effacée
+- **Analyse post-mortem** : Après une attaque, comprendre comment l'attaquant a pénétré le système
+- **Malware fileless** : Détecter des malwares qui n'écrivent jamais sur le disque et résident uniquement en RAM
+- **Vol de credentials** : Extraire des mots de passe en clair (navigateurs, sessions RDP, Mimikatz-like)
+- **Connexions suspectes** : Identifier des connexions réseau cachées vers des C2 (Command & Control)
+
+### Types de fichiers supportés
+
+Volatility supporte de nombreux formats de dumps :
+
+| Format      | Extension                 | Source                        |
+| ----------- | ------------------------- | ----------------------------- |
+| Raw/DD      | `.raw`, `.dd`, `.bin`     | Dumps bruts (FTK Imager, dd)  |
+| EWF         | `.E01`                    | EnCase                        |
+| VMware      | `.vmem`, `.vmss`, `.vmsn` | Snapshots VMware              |
+| VirtualBox  | `.elf`, `.sav`            | Snapshots VirtualBox          |
+| LiME        | `.lime`                   | Linux Memory Extractor        |
+| Crashdump   | `.dmp`                    | Windows BSOD dumps            |
+| Hibernation | `hiberfil.sys`            | Fichier d'hibernation Windows |
+
+### Outils pour créer un dump mémoire
+
+#### Sur Windows
+
+**FTK Imager** (gratuit) :
+
+1. Télécharger depuis [AccessData](https://www.exterro.com/ftk-imager)
+2. File → Capture Memory
+3. Choisir le chemin de destination
+4. Sélectionner le format `.raw`
+
+**WinPmem** (ligne de commande) :
+
+```bash
+winpmem_mini_x64.exe output.raw
+```
+
+**Dumplt** (simple et portable) :
+
+```bash
+DumpIt.exe
+# Génère automatiquement un fichier .raw
+```
+
+#### Sur Linux
+
+**LiME (Linux Memory Extrator)** :
+
+```bash
+git clone https://github.com/504ensicsLabs/LiME.git
+cd LiME/src
+make
+sudo insmod lime-$(uname -r).ko "path=/tmp/dump.lime format=lime"
+```
+
+#### Depuis une VM
+
+**VMWare** : Les fichier .vnem sont créés automatiquement lors d'un snapshot ou d'une suspension.
+
+**VirtualBox** :
+
+```bash
+VBoxManage debugvm "NomVM" dumpvmcore --filename dump.elf
+```
+
+### Structure d'un dump mémoire :
+
+Un dump mémoire contient :
+
+| Zone             | Contenu                                                                                             |
+| ---------------- | --------------------------------------------------------------------------------------------------- |
+| **Kernel Space** | Drivers chargés, structures du noyau, tables de processus                                           |
+| **User Space**   | Processus utilisateur, DLLs chargées, heap/stack des applications, données en clair (mots de passe) |
+
+## Installation
+
+### Prérequis
+
+- Python 3.8 ou supérieur
+- pip
+
+### Installation via pip
+
+```bash
+pip install volatility3
+```
+
+### Installation depuis les sources
+
+```bash
+git clone https://github.com/volatilityfoundation/volatility3.git
+cd volatility3
+
+# Activer un environnement virtuel
+python3 -m venv .venv
+source .venv/bin/activate
+
+# Installer
+pip3 install -e ".[full]"
+vol -h # Affichage commande help
+```
+
+## Utilisation
+
+Illustration de l'utilisation de l'outil via un [CTF](https://www.root-me.org/fr/Challenges/Forensic/Command-Control-niveau-2) sur RootMe, dans la catégorie forensic.
+
+### Objectif
+
+Nous disposons d'un **dump mémoire** d'une machine compromise. L'objectif est de retrouver le **nom de la machine** uniquement à partir de ce dump.
+
+C'est un cas typique d'analyse forensique : extraire des informations système à partir d'une capture mémoire.
+
+### Résolution
+
+#### Etape 1 : Identifier le profil du dump
+
+```bash
+vol -f ch2.dmp windows.info
+```
+
+![Identification machine](/static/images/volatility/Capture1.png)
+
+| Variable       | Valeur                            |
+| -------------- | --------------------------------- |
+| Is64Bit        | False                             |
+| NTBuildLab     | 7600.16385.x86fre.win7_rtm.090713 |
+| NtSystemRoot   |  C:\Windows                       |
+| NtMajorVersion | 6                                 |
+| NtMinorVersion | 1                                 |
+
+On identifie un système **Windows 7 32-bit** (build 7600, version 6.1).
+
+#### Etape 2 : Récupérer le nom de la machine
+
+Le nom de la machine est stocké dans le registre Windows. On l'extrait avec :
+
+```bash
+vol -f ch2.dmp windows.registry.printkey --key "ControlSet001\Control\ComputerName\ComputerName"
+# Cette information est connue car c'est l'emplacement standard où Windows stocke le nom de l'ordinateur. En forensique, connaître les emplacements clés du registre Windows est essentiel.
+```
+
+![Récupération nom machine avec registre](/static/images/volatility/Capture2.png)
+
+Alternativement, via les variables d'environnement :
+
+```bash
+vol -f ch2.dmp windows.envars | grep -i computername
+```
+
+![Récupération nom machine avec variables d'environnement](/static/images/volatility/Capture3.png)
+
+#### Résultat
+
+Le nom de la machine apparaît dans la sortie et constitue le flag du challenge.
+
+## Conclusion
+
+Volatility est un outil **incontournable** pour toute analyse forensique de la mémoire RAM. Sa puissance réside dans sa flexibilité et la richesse de ses plugins.
+
+### Plusieurs chemins, un même objectif
+
+Comme illustré dans cet article, il existe souvent **plusieurs méthodes** pour atteindre un même résultat :
+
+- Extraire le nom d'une machine via le **registre** ou les **variables d'environnement**
+- Identifier un processus malveillant via `pslist`, `psscan` ou `malfind`
+- Retrouver des connexions réseau avec `netstat` ou `netscan`
+
+L'approche forensique demande de la **créativité** et de l'**expérimentation**. Si une commande ne donne pas le résultat attendu, une autre technique peut fonctionner.
+
+### Pour aller plus loin
+
+- [Documentation officielle Volatility 3](https://volatility3.readthedocs.io/)
+- [Cheatsheet des commandes](https://blog.onfvp.com/post/volatility-cheatsheet/)
+- [Challenges forensiques sur Root-Me](https://www.root-me.org/fr/Challenges/Forensic/)
+- [Memory samples pour s'entraîner](https://github.com/volatilityfoundation/volatility/wiki/Memory-Samples)
+
+---
+
+_H. BENAYACHE, H. GEOFFRAY_
