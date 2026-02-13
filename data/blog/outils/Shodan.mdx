@@ -1,0 +1,144 @@
+---
+title: Shodan – Le moteur de recherche pour l'Internet des objets connectés
+date: '2026-02-13'
+tags: ['sécurité', 'reconnaissance', 'IoT', 'OSINT', 'outils']
+draft: false
+summary: Présentation de Shodan, le moteur de recherche qui indexe les appareils connectés à Internet et révèle l'exposition des systèmes dans le monde entier.
+---
+
+Dans le domaine de la cybersécurité, la reconnaissance est la première étape cruciale de toute analyse de sécurité. **Shodan** se distingue comme un outil unique qui permet de découvrir ce qui est réellement exposé sur Internet, agissant comme un **annuaire mondial des appareils connectés**.
+
+## Qu'est-ce que Shodan ?
+
+Créé en 2009 par John Matherly, Shodan est souvent surnommé **"le moteur de recherche le plus effrayant d'Internet"**. Contrairement à Google qui indexe des pages web, Shodan scanne en permanence Internet pour **indexer les appareils, serveurs et objets connectés** accessibles publiquement.
+
+Shodan révèle l'étendue réelle de l'exposition des systèmes : caméras de surveillance, serveurs industriels, routeurs, bases de données, et bien d'autres appareils que leurs propriétaires pensent parfois privés.
+
+## Fonctionnalités principales
+
+### Recherche par critères multiples
+
+Shodan permet de filtrer les résultats selon de nombreux critères :
+- **Localisation géographique** (pays, ville)
+- **Ports ouverts** et services actifs
+- **Systèmes d'exploitation**
+- **Versions de logiciels**
+- **Organisation propriétaire**
+
+### Identification de vulnérabilités
+
+L'outil peut identifier des systèmes utilisant des **versions obsolètes** de logiciels avec des vulnérabilités connues (CVE), permettant aux entreprises de découvrir leurs failles avant les attaquants.
+
+### Cartographie de l'exposition
+
+Shodan offre une visualisation géographique de l'exposition des appareils, révélant la concentration d'équipements vulnérables par région.
+
+### API et automatisation
+
+Pour les professionnels, Shodan propose une **API** permettant d'automatiser les recherches et d'intégrer les données dans des workflows de sécurité.
+
+## Utilisation
+
+### Créer un compte
+
+1. Rendez-vous sur [https://www.shodan.io](https://www.shodan.io)
+2. Créez un compte gratuit (nécessaire pour effectuer des recherches)
+3. La version gratuite offre des fonctionnalités limitées mais suffisantes pour découvrir l'outil
+
+### Exemples de recherches
+
+**Recherche basique par appareil** :
+```
+webcam
+```
+Trouve des webcams exposées sur Internet
+
+**Recherche par port** :
+```
+port:22
+```
+Identifie les serveurs SSH accessibles
+
+**Recherche géographique** :
+```
+country:FR
+```
+Limite les résultats à la France
+
+**Recherches combinées** :
+```
+apache country:FR
+```
+Serveurs Apache en France
+```
+port:3389 city:Paris
+```
+Serveurs Windows RDP à Paris
+
+### Interpréter les résultats
+
+Pour chaque appareil trouvé, Shodan affiche :
+- L'adresse IP et le nom d'hôte
+- L'organisation propriétaire
+- La localisation approximative
+- Les ports ouverts et bannières des services
+- Les certificats SSL le cas échéant
+- Les vulnérabilités potentielles identifiées
+
+## Cas d'usage légitimes
+
+### Audit de sécurité
+
+Les entreprises utilisent Shodan pour **auditer leur propre exposition** : découvrir les systèmes oubliés, les services mal configurés, ou les équipements que personne ne savait connectés à Internet.
+
+### Recherche en sécurité
+
+Les chercheurs utilisent Shodan pour :
+- Identifier les tendances de vulnérabilités à grande échelle
+- Mesurer l'adoption de correctifs de sécurité
+- Découvrir de nouveaux vecteurs d'attaque
+
+### Intelligence économique (OSINT)
+
+Dans le cadre légal, Shodan permet de cartographier l'infrastructure technique d'organisations pour des analyses concurrentielles.
+
+## Aspects éthiques et légaux
+
+> **⚠️ AVERTISSEMENT CRITIQUE** : Shodan est un outil **d'observation uniquement**. Son utilisation est légale, mais **accéder aux systèmes découverts sans autorisation est illégal**.
+
+### Ce qui est LÉGAL :
+- ✅ Rechercher des appareils sur Shodan
+- ✅ Consulter les informations publiquement exposées
+- ✅ Auditer **ses propres systèmes**
+- ✅ Utiliser les données pour la recherche académique
+
+### Ce qui est ILLÉGAL :
+- ❌ Se connecter à un appareil trouvé sans autorisation
+- ❌ Tenter d'exploiter des vulnérabilités découvertes
+- ❌ Accéder à des données même si aucun mot de passe n'est requis
+- ❌ Utiliser les informations pour du harcèlement ou de l'espionnage
+
+**En France**, l'accès frauduleux à un système informatique est puni par l'article 323-1 du Code pénal de **2 ans d'emprisonnement et 60 000€ d'amende**.
+
+## Se protéger contre Shodan
+
+Pour éviter que vos systèmes n'apparaissent dans Shodan :
+
+1. **Limiter l'exposition** : Ne pas exposer de services sur Internet s'ils ne sont pas nécessaires
+2. **Utiliser des VPN** : Placer les services sensibles derrière un VPN
+3. **Configurer des pare-feu** : Restreindre l'accès par IP
+4. **Mettre à jour régulièrement** : Éviter les versions obsolètes avec vulnérabilités connues
+5. **Utiliser l'authentification forte** : Jamais de services sans mot de passe ou avec credentials par défaut
+6. **Opt-out Shodan** : Possibilité de demander le retrait via [https://help.shodan.io](https://help.shodan.io)
+
+## Conclusion
+
+Shodan est un outil puissant qui met en lumière une réalité souvent ignorée : **des millions d'appareils sont exposés sur Internet sans protection adéquate**. Utilisé de manière éthique, il constitue un excellent outil de sensibilisation et d'audit de sécurité.
+
+La vraie leçon de Shodan n'est pas qu'on peut trouver des systèmes vulnérables, mais plutôt qu'il est **essentiel de sécuriser tout ce qui est connecté à Internet**.
+
+Pour découvrir l'outil : [https://www.shodan.io](https://www.shodan.io)
+
+---
+
+_Raneda KERFI, Hajer KLAI_
