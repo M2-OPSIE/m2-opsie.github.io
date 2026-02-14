@@ -1,0 +1,97 @@
+# Tails OS
+
+## Introduction
+
+Tails, pour "The Amnesic Incognito Live System", est un système d'exploitation portable basé sur Debian GNU/Linux. Il a été concu dans un seul objectif : protéger la vie privée et l'anonymat de ses utilisateurs face à la surveillance numérique et la censure. Ce qui le rend particulier, c'est qu'il fonctionne comme un systeme live, c'est-à-dire qu'on le démarre directement depuis une cle USB ou un DVD, sans rien installer sur la machine hôte. Quand Tails est éteint, il ne reste aucune trace sur l'ordinateur utilisé.
+
+Le projet a vu le jour le 23 juin 2009, sous le nom d'Amnesia, avant de devenir Tails tel qu'on le connaît aujourd'hui. En septembre 2024, un évènement majeur a eu lieu : Tails a officiellement fusionné avec le Tor Project, le rendant desormais partie intégrante de cette organisation à but non lucratif dediée a la liberté sur internet. Cette fusion permet aux deux projets de mutualiser leurs ressources et de mieux répondre aux menaces numeriques actuelles.
+
+La version stable actuelle est Tails 7.4.2, basée sur Debian 13 "Trixie" et l'environnement de bureau GNOME 48.
+
+
+## Fonctionnement
+
+Le principe de Tails est assez simple à comprendre. L'ensemble du système tourne en mémoire vive (RAM) et ne touche jamais au disque dur de la machine sur laquelle il est lancé. Concrètement, quand un ordinateur est démarré sur clé USB contenant Tails, on obtient un environnement de travail complet et securisé. Une fois la machine éteinte ou la clé retirée, la RAM est effacee et toutes les donnees de la session disparaissent. C'est de la que vient le terme "amnésique" de son nom.
+
+Tails intègre un mecanisme spécifique pour contrer les attaques dites de "cold boot", ou un attaquant tenterait de récupérer des informations résiduelles en mémoire apres l'extinction. Au moment de l'arrêt du système, Tails écrase activement la majeure partie de la mémoire vive pour empêcher toute récupération.
+
+Par défaut, tout le trafic réseau passe obligatoirement par Tor. Les connexions qui ne passent pas par Tor sont bloquées. Cela signifie que l'adresse IP réelle de l'utilisateur n'est jamais exposée aux sites ou services auxquels il accède. Tor fonctionne en acheminant le trafic à travers plusieurs relais (au minimum trois), en chiffrant les données a chaque étape, ce qui rend la tracabilite extrêmement difficile.
+
+
+## Les outils integres
+
+![Applistails](applis1.png)
+![Applis2tails](appli2.png)
+
+Tails est livré avec un ensemble d'outils soigneusement sélectionnés pour couvrir les besoins courants en matière de sécurite et de communication :
+
+- Tor Browser : le navigateur par défaut, basé sur Firefox, configuré pour passer par le reseau Tor. Il inclut uBlock Origin pour le blocage des traceurs et publicités.
+- Thunderbird : client de messagerie avec prise en charge du chiffrement via OpenPGP, permettant d'envoyer et recevoir des mails chiffrés.
+- KeePassXC : gestionnaire de mots de passe hors ligne, reconnu pour sa fiabilité et sa securité.
+- OnionShare : un outil qui permet de partager des fichiers de manière anonyme via le réseau Tor, sans passer par un serveur tiers.
+- Kleopatra : interface graphique pour la gestion des clés de chiffrement (OpenPGP et X.509).
+- Electrum : portefeuille Bitcoin, utile dans les contextes ou les transactions financières doivent rester anonymes.
+- LUKS : le systàme de chiffrement de disque utilisé pour le stockage persistant sur la clé USB.
+- Netoyeur de métadonnées : outil intégré qui permet de supprimer automatiquement les métadonnées cachées des fichiers (documents, images, PDF, etc.) avant leur partage
+
+L'environnement de bureau GNOME fournit également les applications classiques pour la bureautique, l'édition d'images et la lecture multimédia.
+
+
+## Le Persistent Storage
+
+Même si Tails est concu pour ne rien garder entre les sessions, il existe une fonctionnalité appelee Persistent Storage qui permet de sauvegarder certaines données de manière chiffrée directement sur la clé USB. On peut y stocker des documents, des signets du navigateur, des clés de chiffrement, des configurations reséau, ou encore des logiciels supplémentaires.
+
+Ce stockage est entièrement chiffré avec LUKS et protegé par une phrase de passe choisie par l'utilisateur. L'idée est de permettre un usage régulier de Tails sans sacrifier la sécurité : les données sensibles restent chiffrées et ne sont accessibles que lorsque l'utilisateur déverrouille manuellement le volume persistant au démarrage.
+
+
+## Pourquoi Tails est utile en cybersecurite
+
+Dans le domaine de la cybersecurité, Tails repond a plusieurs besoins concrets.
+
+D'abord, pour les analystes ou les chercheurs en securite qui doivent accéder a des ressources sur le dark web ou étudier des menaces en ligne, Tails offre un environnement jetable et isolé. Comme rien n'est écrit sur le disque dur et que tout le trafic passe par Tor, le risque de compromission de la machine hôte est quasi nul.
+
+Pour les journalistes, les lanceurs d'alerte ou les activistes travaillant dans des environnements hostiles, Tails est un outil de survie numérique. Il permet de communiquer, publier et échanger des documents sans laisser de traces exploitables par un adversaire disposant d'un accès physique ou réseau à la machine.
+
+En matière de réponse a incident, Tails peut servir d'environnement propre pour analyser des fichiers suspects ou accéder a des ressources en ligne sans exposer l'infrastructure de l'organisation.
+
+Enfin, du point de vue de la sensibilisation et de la formation, comprendre le fonctionnement de Tails permet de mieux appréhender des concepts fondamentaux comme le routage en oignon, le chiffrement de bout en bout, la gestion de la memoire volatile, et les limites de l'anonymat en ligne. Il faut par exemple comprendre que si la machine hôte sur laquelle on lance tail (par exemple par un keylogger), l'attaquant pourra comprendre ce qui se passe sur Tails. 
+
+Il faut néanmoins garder à l'esprit que Tails n'est pas une solution miracle. La NSA elle-même a qualifié Tails de "menace majeure" pour ses capacités de surveillance dans des documents internes datant de 2012, révélés par Der Spiegel en 2014. Mais des cas comme celui de 2017, ou le FBI a réussi a identifier un utilisateur de Tails grâce a une faille zero-day dans le lecteur video intégré, montrent qu'aucun systeme n'est invulnérable. La securite repose toujours sur une combinaison d'outils, de pratiques et de vigilance.
+
+
+## La fusion avec le Tor Project
+
+En septembre 2024, Tails a officiellement rejoint le Tor Project. Cette décision, initiee par l'equipe de Tails fin 2023, a été motivée par le fait que le projet avait dépassé les capacités de sa structure indépendante. Après 15 ans de développement autonome, les aspects organisationnels comme la recherche de financements, la gestion administrative et les ressources humaines pesaient de plus en plus sur l'équipe.
+
+En intégrant la structure du Tor Project, Tails bénéficie desormais d'un cadre organisationnel plus solide. Les développeurs de Tails forment une equipe dédiée au sein du Tor Project, tout en conservant leur autonomie technique sur le système d'exploitation. Cette fusion permet aussi d'élargir les programmes de formation et de sensibilisation, et de toucher un public plus large.
+
+Les deux projets ont toujours ete complémentaires : Tor anonymise l'activite réseau, tandis que Tails sécurise l'ensemble du système d'exploitation. Ensemble, ils offrent une solution complète pour les utilisateurs confrontés a des menaces de surveillance ou de censure.
+
+
+## Configuration minimale requise
+
+Pour utiliser Tails, il faut un ordinateur avec un processeur 64 bits compatible x86-64, au moins 3 Go de RAM (depuis Tails 7.0) et une clé USB d'au moins 8 Go. La plupart des Mac sortis apres 2006 sont compatibles, a l'exception des modèles équipés de puces Apple Silicon (M1, M2 et suivants). Tails ne fonctionne pas non plus sur les tablettes et smartphones.
+
+L'installation est documentée de maniere très détaillée sur le site officiel de Tails. Il suffit de télécharger l'image, de la vérifier, puis de la flasher sur une clé USB avec un outil comme Etcher, Rufus ou directement en ligne de commande.
+
+
+## Conclusion
+
+Tails est un outil essentiel dans la boîte à outils de tout professionnel de la cybersecurité. Que ce soit pour mener des investigations en ligne de manière anonyme, protéger des communications sensibles, ou simplement comprendre les mécanismes de protection de la vie privée à l'échelle d'un systeme d'exploitation. Tails est une référence incontournable. Sa fusion avec le Tor Project en 2024 ne fait que renforcer sa position comme pilier de l'écosystème de la confidentialité numérique.
+
+
+---
+
+Réalisé par Martin Bétard et Salah-Eddine Slaoui
+
+Master 2 Informatique - Organisation et Protection des Systèmes d'Information en Entreprise (OPSIE)
+
+Universite Lumiere Lyon 2 - 2025/2026
+
+---
+
+Sources :
+- Site officiel : https://tails.net
+- Documentation Tails : https://tails.net/doc/about/features/
+- Annonce de la fusion Tor/Tails : https://blog.torproject.org/tor-tails-join-forces/
+- Wikipedia : https://en.wikipedia.org/wiki/Tails_(operating_system)
