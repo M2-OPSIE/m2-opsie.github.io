@@ -1,0 +1,155 @@
+---
+title: Nuclei – Scanner de vulnérabilités basé sur des templates
+date: '2026-02-14'
+tags: ['sécurité', 'vulnérabilités', 'cve', 'web', 'api', 'outils']
+draft: false
+summary: Présentation de Nuclei, un scanner rapide utilisant des templates communautaires pour détecter des CVEs, failles de configuration et exposures sur sites web et APIs.
+---
+
+## Introduction
+
+[Nuclei](https://github.com/projectdiscovery/nuclei) est un **scanner de vulnérabilités** qui s'appuie sur des **templates YAML** maintenus par la communauté. Il permet de détecter rapidement:
+
+- **CVEs connues** (RCE, LFI, SSRF, Auth Bypass, etc.)
+- **Panneaux exposés** et **routes sensibles**
+- **Mauvaises configurations** (headers, CORS, directory listing, etc.)
+- **Failles applicatives** sur **APIs** et endpoints spécifiques
+
+Il se distingue par sa **rapidité**, sa **scalabilité** et sa **couverture** grâce aux milliers de templates déjà prêts.
+
+## Installation
+
+### Linux (Debian/Kali)
+
+```bash
+sudo apt update
+sudo apt install nuclei
+```
+
+### Via Go (toutes plateformes)
+
+```bash
+go install -v github.com/projectdiscovery/nuclei/v2/cmd/nuclei@latest
+```
+
+### Mettre à jour les templates
+
+```bash
+nuclei -update-templates
+# ou
+nuclei -ut
+```
+
+## Usage essentiel
+
+### 1) Scanner une URL avec un set de templates par tags
+
+```bash
+nuclei -u https://target.tld -tags cve,exposure,misconfig -severity high,critical -o results.txt
+```
+
+- `-tags`: sélection par **thèmes** (ex: `cve`, `exposure`, `misconfig`, `dns`, `ssl`)
+- `-severity`: filtre par **sévérité** (ex: `medium,high,critical`)
+- `-o`: **export** des résultats
+
+### 2) Scanner une liste d'URLs
+
+```bash
+nuclei -l urls.txt -tags cve -severity high,critical -o nuclei-findings.txt
+```
+
+- `-l`: fichier d'**URLs** (une par ligne)
+
+### 3) Lancer un template spécifique (ex: CVE Apache Path Traversal)
+
+```bash
+nuclei -u https://target.tld -t cves/2021/CVE-2021-41773.yaml
+```
+
+### 4) Scanner des APIs (headers + JSON)
+
+```bash
+nuclei -u https://api.target.tld/v1/login \
+  -H "Authorization: Bearer <TOKEN>" \
+  -H "Content-Type: application/json" \
+  -tags api,misconfig -severity medium,high
+```
+
+### 5) Performance et contrôle
+
+```bash
+nuclei -l scope.txt -rl 100 -c 50 -nc -json -o out.json
+```
+
+- `-rl`: **rate limit** (requêtes/sec)
+- `-c`: **concurrence**
+- `-nc`: pas de couleurs (utile pour CI)
+- `-json`: sortie **JSON** pour intégration
+
+## Filtrage & sélection
+
+- `-tags`: choisir des **familles de tests** (ex: `cve`, `exposure`, `fuzz`, `ssl`)
+- `-severity`: `informational,low,medium,high,critical`
+- `-exclude-tags`: ignorer des catégories (ex: `dos`) 
+- `-timeout`: ajuster les **timeouts** si la cible est lente
+
+## Bonnes pratiques
+
+- **Toujours** mettre à jour les templates (`-ut`) avant un scan
+- Définir un **scope** précis (liste d'URLs, sous-domaines autorisés)
+- Filtrer par **sévérité** pour réduire les faux positifs
+- Exporter en **JSON** pour un tri et une **corrélation** faciles
+- Respecter les **règles légales** (ne jamais scanner sans autorisation)
+
+## Créer un template personnalisé
+
+Voici un exemple minimal de **template YAML** pour détecter une page d'administration exposée :
+
+```yaml
+id: custom-exposure-check
+info:
+  name: Custom Exposure Check
+  severity: medium
+requests:
+  - method: GET
+    path:
+      - "{{BaseURL}}/admin"
+    matchers:
+      - type: word
+        words:
+          - "Login"
+        part: body
+```
+
+Exécution du template personnalisé :
+
+```bash
+nuclei -u https://target.tld -t ./templates/custom-exposure-check.yaml
+```
+
+## Maintenance des templates
+
+- Mettre à jour régulièrement : `nuclei -ut`
+- Emplacement par défaut (Linux) : `~/.local/share/nuclei-templates`
+- Réduire le bruit : utiliser `-tags` / `-exclude-tags` pour cibler vos cas d’usage
+- Figer un set connu : conservez un snapshot des templates pour des scans reproductibles
+
+## Traitement des résultats
+
+Exporter en **JSON** puis agréger rapidement avec `jq` :
+
+```bash
+nuclei -l urls.txt -tags cve,exposure -severity medium,high,critical -json -o out.json
+jq -r '.severity' out.json | sort | uniq -c
+jq -r '[.templateID, .severity, .host] | @tsv' out.json > findings.tsv
+```
+
+## Références
+
+- Repo: https://github.com/projectdiscovery/nuclei
+- Templates officiels: https://github.com/projectdiscovery/nuclei-templates
+- Docs: https://docs.projectdiscovery.io/nuclei/overview
+
+---
+
+_R. JABIL, F. GOUMRHAR_
