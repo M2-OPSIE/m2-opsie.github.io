@@ -1,0 +1,191 @@
+---
+title: Amass - Enumeration de sous-domaines pour la reconnaissance
+date: '2026-02-14'
+tags: ['securite', 'osint', 'reconnaissance', 'outils', 'amass']
+draft: false
+summary: Presentation de Amass, un outil OSINT et DNS tres utile pour enumerer les sous-domaines et cartographier la surface d'attaque.
+---
+
+Dans mes phases de reconnaissance, **Amass** est un outil que j'utilise presque systematiquement.
+Il est open source, fiable, et tres efficace pour cartographier les actifs externes d'une cible.
+Son but principal est de decouvrir des sous-domaines, enrichir les informations DNS, puis aider a comprendre la surface d'attaque reelle.
+
+## Objectifs
+
+Avec Amass, je cherche surtout a:
+
+- Enumerer les sous-domaines d'un domaine cible
+- Recuperer des informations DNS utiles (A, CNAME, NS, MX, etc.)
+- Identifier des actifs exposes et des points d'entree potentiels
+- Alimenter les phases suivantes (scan, fingerprinting, validation)
+
+## Fonctionnalités principales
+
+### Enumeration passive et active
+
+Amass combine plusieurs techniques d'enumeration:
+
+- Reconnaissance passive
+- Reconnaissance active
+- Brute force avec wordlist
+- Correlation des donnees entre plusieurs sources
+
+### Base de connaissances locale
+
+Amass peut stocker les resultats localement pour:
+
+- Comparer les resultats entre plusieurs runs
+- Suivre l'evolution d'un perimetre dans le temps
+- Rejouer des analyses rapidement
+
+### Visualisation et pivot
+
+Amass permet aussi de mieux visualiser les relations entre:
+
+- Domaines et sous-domaines
+- IP et ASN
+- Infrastructure DNS
+
+Ce point est pratique pour detecter des pivots interessants en audit.
+
+### Sources de donnees
+
+Amass utilise plusieurs sources pour ses recherches:
+
+- DNS records
+- Certificate Transparency logs
+- Search engines
+- Web archives
+- APIs publiques
+- Passive DNS
+- GitHub et autres depots de code
+- Sources ouvertes diverses
+
+## Utilisation
+
+### Prérequis
+
+- Go installe (si installation via source)
+- Acces Internet pour les sources passives
+- (Optionnel) Clés API pour enrichir les resultats
+
+### Installation
+
+Avec Docker:
+
+```bash
+docker pull caffix/amass
+docker run --rm caffix/amass enum -d example.com
+```
+
+Avec Go:
+
+```bash
+go install github.com/owasp-amass/amass/v4/...@master
+amass -version
+```
+
+### Ligne de commande
+
+Commande basique (enum d'un domaine):
+
+```bash
+amass enum -d example.com
+```
+
+Lecture de plusieurs domaines depuis un fichier:
+
+```bash
+amass enum -df domains.txt
+```
+
+Sauvegarde des resultats dans un fichier:
+
+```bash
+amass enum -d example.com -o results.txt
+```
+
+Brute force de sous-domaines:
+
+```bash
+amass enum -brute -w subdomains.txt -d example.com
+```
+
+Resolution DNS:
+
+```bash
+amass resolve -d example.com
+```
+
+Mode verbeux:
+
+```bash
+amass enum -d example.com -v
+```
+
+Afficher les sources utilisees:
+
+```bash
+amass enum -d example.com -src
+```
+
+Mode passif uniquement:
+
+```bash
+amass enum -passive -d example.com
+```
+
+Mode actif:
+
+```bash
+amass enum -active -d example.com
+```
+
+Aide:
+
+```bash
+amass -h
+```
+
+Exemple de workflow concret que j'utilise:
+
+1. `amass enum -passive -d target.com`
+2. `amass enum -active -brute -d target.com`
+3. Dedoublonner les resultats
+4. Passer les domaines valides vers le scan HTTP et la prise d'empreinte
+
+Dedoublonnage rapide:
+
+```bash
+sort -u amass_example.txt > amass_unique.txt
+```
+
+### Exemples de sortie
+
+| Commande | Fonction | Exemple de sortie |
+| --- | --- | --- |
+| `amass enum -d example.com` | Decouverte de sous-domaines | `sub1.example.com`, `sub2.example.com` |
+| `amass enum -df domains.txt` | Enumeration multi-domaines | `Testing domains from domains.txt...` |
+| `amass enum -d example.com -o results.txt` | Export fichier | `Results saved to results.txt` |
+| `amass enum -d example.com -v` | Mode detaille | `Verbose mode enabled` |
+| `amass resolve -d example.com` | Resolution DNS | `sub1.example.com -> 192.0.2.1` |
+| `amass enum -d example.com -src` | Affiche les sources | `Using data sources: ...` |
+
+## Bonnes pratiques
+
+- Limiter les recherches a vos perimetres autorises
+- Documenter les resultats et prioriser les risques critiques
+- Verifier les faux positifs avant toute conclusion
+- Croiser avec d'autres sources avant de conclure
+
+## Cadre légal et éthique
+
+Amass reste un outil de reconnaissance. Je l'utilise uniquement dans un cadre autorise:
+
+- Les lois en vigueur
+- Le perimetre autorise (audit interne, bug bounty, pentest encadre)
+- Les règles de divulgation responsable
+
+---
+
+_AATANY MEZZOURH_
