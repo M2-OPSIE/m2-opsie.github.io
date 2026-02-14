@@ -1,14 +1,18 @@
-{
-  "sécurité": 1,
-  "scanner-réseau": 1,
-  "audit": 1,
-  "ia": 1,
-  "outils": 2,
-  "multi-author": 1,
-  "next-js": 1,
-  "feature": 1,
-  "actualite": 1,
-  "markdown": 1,
-  "code": 1,
-  "features": 1
+﻿{
+    "sÃ©curitÃ©":  1,
+    "scanner-rÃ©seau":  1,
+    "audit":  1,
+    "ia":  1,
+    "outils":  3,
+    "multi-author":  1,
+    "next-js":  1,
+    "feature":  1,
+    "actualite":  1,
+    "markdown":  1,
+    "code":  1,
+    "features":  1,
+    "securite":  1,
+    "osint":  1,
+    "reconnaissance":  1,
+    "amass":  1
 }
