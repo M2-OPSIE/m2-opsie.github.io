@@ -1,14 +1,18 @@
 {
-  "sécurité": 1,
-  "scanner-réseau": 1,
-  "audit": 1,
-  "ia": 1,
-  "outils": 2,
   "multi-author": 1,
   "next-js": 1,
   "feature": 1,
   "actualite": 1,
   "markdown": 1,
   "code": 1,
-  "features": 1
+  "features": 1,
+  "outils": 3,
+  "cybersécurité": 1,
+  "threat-intelligence": 1,
+  "partage-de-renseignement": 1,
+  "open-source": 1,
+  "sécurité": 1,
+  "scanner-réseau": 1,
+  "audit": 1,
+  "ia": 1
 }

@@ -1,0 +1,171 @@
+---
+title: MISP – Plateforme Open Source de Partage d'Indicateurs de Compromission
+date: '2026-02-08'
+tags: ['cybersécurité', 'threat intelligence', 'partage de renseignement', 'open source', 'outils']
+draft: false
+summary: MISP est une plateforme open source conçue pour le partage et l'analyse des indicateurs de compromission (IoC) et des événements de sécurité au sein des organisations.
+---
+
+## Introduction
+
+**MISP** (Malware Information Sharing Platform) est une plateforme open source développée par le [CIRCL](https://www.circl.lu/) (Computer Incident Response Center Luxembourg). Elle offre une solution complète de **partage de renseignement sur les menaces** (Threat Intelligence) et de **centralisation des indicateurs de compromission** au sein des organisations.
+
+Face à l'augmentation des incidents de sécurité, la collaboration et le partage d'informations entre organisations, équipes de sécurité et communautés de cybersécurité sont devenues essentiels. C'est dans cette optique que MISP s'inscrit, en permettant une agrégation, une analyse et un partage sécurisé des données de menaces.
+
+## Objectifs principaux
+
+### 1. Centraliser les renseignements sur les menaces
+
+MISP collecte et centralise les indicateurs de compromission provenant de multiples sources :
+- **Logs d'incidents** internes
+- **Rapports de menaces** externes
+- **Flux de renseignement** d'autres organisations
+- **Alertes de sécurité** en temps réel
+
+### 2. Partager les informations de manière sécurisée
+
+La plateforme permet aux organisations de partager des indicateurs de compromission de façon contrôlée et confidentielle, tout en protégeant la sensibilité des données.
+
+### 3. Faciliter l'analyse collaborative
+
+MISP offre des outils pour l'analyse conjointe des menaces, permettant aux analystes de sécurité de travailler ensemble sur des cas d'incidents.
+
+## Fonctionnalités clés
+
+### Gestion des indicateurs de compromission (IoC)
+
+MISP propose une base de données centralisée pour stocker et catégoriser les IoC :
+- **Hashes de malwares** (MD5, SHA1, SHA256)
+- **Adresses IP** suspectes
+- **Domaines** et **URLs** malveillants
+- **Adresses email** compromises
+- **Certificats SSL** suspects
+- **Noms de fichiers** associés à des malwares
+- **Patterns YARA** pour la détection
+
+### Taxonomies et tagging
+
+Les événements et les indicateurs sont étiquetés selon des taxonomies standardisées, facilitant l'organisation et la recherche :
+- Classification des incidents
+- Type de menace
+- Secteur d'activité affecté
+- Gravité et urgence
+
+### Partage d'informations
+
+Plusieurs modes de partage sont disponibles :
+- **Partage interne** : au sein d'une organisation uniquement
+- **Partage avec des pairs** : partenaires, fournisseurs de sécurité
+- **Partage public** : contributions à la communauté globale de cybersécurité
+- **Partage sur demande** : avec contrôle fin des accès
+
+### Corrélation automatique
+
+MISP identifie automatiquement les relations entre les événements et les indicateurs, révélant des patterns et des liens qui ne seraient pas évidents à première vue.
+
+### Intégration avec d'autres outils
+
+La plateforme se connecte facilement avec :
+- **Systèmes SIEM** (Splunk, ElasticSearch, etc.)
+- **Firewalls** et **IDS/IPS**
+- **Outils de sandboxing** (Cuckoo, Joe Sandbox)
+- **Feeds de renseignement** externes
+- **API REST** pour les intégrations personnalisées
+
+### Visualisation des données
+
+MISP propose plusieurs vues pour l'analyse :
+- **Timeline** des événements
+- **Galaxy** : visualisation graphique des relations entre IoC
+- **Heatmaps** et statistiques
+- **Graphes de corrélation**
+
+## Avantages pour les organisations
+
+### 1. Réactivité accrue
+
+En centralisant les indicateurs de menaces, les équipes réagissent plus rapidement aux incidents détectés par les autres organisations.
+
+### 2. Efficacité des investigations
+
+Les analystes bénéficient d'informations contextuelles riches, réduisant le temps d'analyse.
+
+### 3. Prévention proactive
+
+L'historique des indicateurs permet d'anticiper et de bloquer les menaces avant qu'elles ne frappent.
+
+### 4. Conformité réglementaire
+
+MISP aide les organisations à documenter et partager les informations selon les exigences de conformité (RGPD, ANSSI, etc.).
+
+### 5. Transparence et confiance
+
+Le caractère open source de MISP garantit la transparence et renforce la confiance au sein des communautés de partage.
+
+## Architecture
+
+### Déploiement
+
+MISP est offert en plusieurs modes :
+- **Serveur centralisé** : hébergé en interne ou sur le cloud
+- **Instances fédérées** : plusieurs serveurs synchronisés
+- **Standalone** : déploiement autonome pour les petites équipes
+
+### Exigences techniques
+
+- **Serveur Linux/Unix** (Debian, Ubuntu, RedHat recommandés)
+- **PHP 7.0+** et **MySQL/MariaDB**
+- **Python 3** pour les fonctionnalités avancées
+- **Docker** pour un déploiement rapide
+
+## Installation rapide avec Docker
+
+```bash
+git clone https://github.com/MISP/misp-docker.git
+cd misp-docker
+docker-compose up -d
+```
+
+Accédez à l'interface web sur : `http://localhost`
+
+## Cas d'usage réels
+
+### 1. Secteur financier
+Les banques utilisent MISP pour partager les indicateurs de fraude et les tentatives de phishing.
+
+### 2. Secteur public
+Les agences gouvernementales l'utilisent pour coordonner la défense contre les menaces nationales et internationales.
+
+### 3. Communautés CERT/CSIRT
+Les équipes de réponse aux incidents partagent les analyses des malwares et des attaques sophistiquées.
+
+### 4. Entreprises de sécurité
+Les fournisseurs de solutions de sécurité utilisent MISP pour enrichir leurs bases de données de menaces.
+
+## Communauté et support
+
+MISP s'appuie sur une **communauté active** :
+- **Forums** : discussions et partage d'expériences
+- **Documentation** : guides d'utilisation complets
+- **Meetings réguliers** : conférences et formations
+- **Projets GitHub** : contributions continues
+
+## Conclusion
+
+**MISP** est un outil indispensable pour les organisations qui souhaitent adopter une approche collaborative de la cybersécurité. En facilitant le partage d'informations de menaces et en centralisant les indicateurs de compromission, MISP renforce la posture défensive collective face aux cyber-menaces.
+
+Que vous soyez une grande entreprise, une agence gouvernementale ou une petite équipe de sécurité, MISP offre la flexibilité et la puissance nécessaires pour construire une stratégie de défense moderne et collaborative.
+
+## Ressources utiles
+
+- **Site officiel** : https://www.misp-project.org/
+- **GitHub** : https://github.com/MISP/MISP
+- **Documentation** : https://misp.github.io/misp-book/
+- **Docker Hub** : https://hub.docker.com/r/misp/misp
+- **CIRCL** : https://www.circl.lu/
+
+---
+
+**Auteurs de cet article :**
+- Mohammed Taha Lazrak
+- Khalid Lakhal
