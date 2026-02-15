@@ -1,0 +1,159 @@
+---
+title: 'Monitoring et sécurité serveur avec Prometheus/Loki/Grafana'
+date: 2026-02-15
+tags: ['cybersécurité', 'monitoring', 'serveur', 'open-source', 'outils']
+draft: false
+summary: Présentation d'une infrastructure de monitoring combinant Prometheus, Loki et Grafana pour surveiller un serveur et détecter les tentatives d'intrusion en temps réel.
+---
+
+Lorsqu'on gère un serveur, deux questions essentielles se posent rapidement : **mon serveur est-il sécurisé ?** et **comment puis-je surveiller son état en temps réel ?** Après avoir connu mes premières tentatives d'intrusion et réalisé l'importance d'avoir une visibilité complète sur son infrastructure, j'ai décidé avec mon camarade Tarek de mettre en place un dashboard de monitoring accessible en ligne.
+
+Dans cet article, je vais vous présenter la solution que nous avons déployée, basée sur la **stack PLG** (Prometheus, Loki, Grafana), ainsi que les mesures de sécurité minimales essentielles pour protéger un serveur.
+
+## La stack PLG
+
+La stack PLG est similaire à la stack ELK (Elasticsearch, Logstash, Kibana) mais offre une alternative plus légère et moins gourmande en ressources. Elle combine trois outils complémentaires qui permettent ensemble d'avoir une vue complète de votre infrastructure.
+
+![PLG Stack](/static/images/plg/vps-monitoring1.png)
+
+### Prometheus : les métriques en temps réel
+
+Prometheus est le cœur du système de métriques. Ce système de monitoring open-source collecte et stocke des métriques sous forme de séries temporelles. Dans notre cas, nous utilisons **Node Exporter** qui collecte les métriques système (CPU, RAM, disque, réseau).
+
+Les données collectées nous permettent de visualiser l'utilisation des ressources en temps réel.
+
+![Métriques temps réel](/static/images/plg/vps-monitoring2.png)
+
+### Loki : centralisation des logs
+
+Plutôt que d'indexer le contenu des logs comme le ferait Elasticsearch, Loki n'indexe que les métadonnées, ce qui le rend extrêmement efficace en termes de stockage et de performances.
+
+Nous utilisons Loki pour centraliser :
+
+- Les logs système (syslog)
+- Les logs applicatifs
+- Les logs de sécurité (notamment fail2ban)
+- Les logs des services Docker
+
+Cette centralisation est cruciale pour corréler les événements et comprendre rapidement ce qui se passe sur le serveur.
+
+### Grafana : visualisation unifiée
+
+Grafana est la couche de visualisation qui unifie le tout. C'est l'interface web que nous consultons quotidiennement et qui permet de :
+
+- Créer des dashboards personnalisés
+- Configurer des alertes
+- Croiser les métriques et les logs
+- Partager les vues avec d'autres personnes si nécessaire
+
+Le gros avantage de Grafana est sa capacité à interroger simultanément Prometheus pour les métriques et Loki pour les logs, offrant ainsi une vue complète de l'état du système.
+
+## Le dashboard de sécurité
+
+L'un des dashboards les plus critiques que nous avons mis en place est dédié à la sécurité. Il permet de surveiller les tentatives d'intrusion et l'efficacité de nos défenses.
+
+![Dashboard sécurité](/static/images/plg/vps-monitoring3.png)
+
+- **23 249 tentatives de connexion SSH échouées** sur la dernière année
+- **5 694 IPs bannies** par fail2ban.
+- **6 connexions réussies** (avec affichage des IPs)
+- Une **distribution géographique** des attaques
+
+Ces chiffres peuvent sembler alarmants, mais ils sont en réalité parfaitement normaux pour un serveur exposé sur Internet. Ce qui compte, c'est qu'aucune de ces tentatives n'a abouti grâce aux mesures de sécurité en place.
+
+## Les bases de la sécurité serveur
+
+Au-delà du monitoring, voici les mesures minimales à mettre en œuvre sur un serveur :
+
+### I. Authentification par clé SSH
+
+**Ne jamais autoriser l'authentification par mot de passe pour SSH.** C'est la règle numéro un. Les clés SSH offrent une sécurité bien supérieure :
+
+```bash
+# Sur votre machine locale, générer une paire de clés
+ssh-keygen -t ed25519 -C "votre_email@example.com"
+
+# Copier la clé publique sur le serveur
+ssh-copy-id utilisateur@votre-serveur
+
+# Sur le serveur, désactiver l'authentification par mot de passe
+# Dans /etc/ssh/sshd_config :
+# PasswordAuthentication no
+# PubkeyAuthentication yes
+```
+
+Cette seule mesure élimine quasi toutes les tentatives d'intrusion par force brute.
+
+### II. Fail2ban : bannissement automatique
+
+Fail2ban surveille les logs et bannit automatiquement les IPs présentant un comportement suspect (souvent des tentatives de connexion répétées avec mot de passé échoué) :
+
+```bash
+# Installation
+apt install fail2ban
+
+# Configuration basique pour SSH
+# /etc/fail2ban/jail.local
+[sshd]
+enabled = true
+port = ssh
+filter = sshd
+logpath = /var/log/auth.log
+maxretry = 3
+bantime = 3600
+findtime = 600
+```
+
+Avec ces paramètres, une IP avec 3 échecs de connexion en 10 minutes sera bannie pour 1 heure.
+
+### III. Autres mesures essentielles
+
+D'autres bonnes pratiques de sécurité de base incluent :
+
+- Configurer un pare-feu (ufw ou iptables) pour n'autoriser que les ports nécessaires
+- Désactiver la connexion root via SSH
+- Maintenir le système à jour avec des mises à jour de sécurité automatiques
+- Utiliser sudo plutôt que de travailler en root
+- Activer les mises à jour automatiques pour les correctifs de sécurité
+
+## Architecture de l'implémentation
+
+Voici comment nous avons structuré notre infrastructure de monitoring :
+
+```
+serveur
+├── Services applicatifs
+│   └── Conteneurs Docker
+├── Prometheus (port 9090)
+│   ├── Node Exporter (9100)
+│   ├── Prometheus (BDD time-series)
+│   └── Scraping des métriques
+├── Loki (port 3100)
+│   ├── Promtail (agent de collecte)
+│   └── Stockage des logs
+└── Grafana (port 3000)
+    ├── Dashboards personnalisés
+    ├── Alerting
+    └── Datasources (Prometheus + Loki)
+```
+
+Tous ces services tournent dans des conteneurs Docker pour faciliter le déploiement et la maintenance. L'accès à Grafana est sécurisé via un tunnel Cloudflare.
+
+## Conclusion
+
+Mettre en place un dashboard de monitoring avec la stack PLG et des mesures de sécurité de base comme fail2ban et l'authentification par clé SSH est une necessité.
+
+La bonne nouvelle, c'est que ces outils sont open-source, gratuits et relativement simples à implémenter.
+
+Si vous gérez un serveur et que vous n'avez pas encore mis en place ces mesures, nous vous encourageons vivement à le faire.
+
+## Ressources utiles
+
+- [Documentation Prometheus](https://prometheus.io/docs/)
+- [Documentation Loki](https://grafana.com/docs/loki/latest/)
+- [Documentation Grafana](https://grafana.com/docs/)
+- [Documentation Fail2ban](https://www.fail2ban.org/)
+
+---
+
+_Olivier ANDRIKO & Tarek BESSAD_
