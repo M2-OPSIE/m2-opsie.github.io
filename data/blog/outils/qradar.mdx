@@ -1,257 +1,345 @@
 ---
-title: QRadar - Plateforme SIEM/SOAR pour centraliser les alertes de sécurité
+title: IBM QRadar - Le Moteur de Détection des Cyberattaques
 date: '2026-02-15'
 tags: ['securite', 'siem', 'soar', 'soc', 'qradar', 'incident-response']
 draft: false
-summary: QRadar est une plateforme SIEM puissante qui centralise les événements de sécurité et automatise la réponse aux incidents. Récemment enrichie avec Criminal IP pour une détection AI-powered.
+summary: IBM QRadar est une plateforme SIEM de référence permettant la centralisation, la corrélation en temps réel et la priorisation des incidents de sécurité dans les environnements hybrides.
 ---
 
-Bon, soyons honnête : **QRadar** c'est un peu comme avoir un "dispatcher" dans ton SOC. 
-Imagine un truc qui reçoit des milliers d'alertes par jour de tous tes systèmes (firewalls, serveurs, antivirus, etc.) et qui essaie de comprendre ce qui se passe vraiment. 
-C'est pas facile, mais c'est hyper important pour ne pas rater une attaque.
+# IBM QRadar : Le Moteur de Détection des Cyberattaques
 
-## Le truc qu'il faut comprendre
+## 1. Introduction
 
-QRadar fait deux choses principales :
+La sécurisation des systèmes d'information nécessite aujourd'hui des mécanismes avancés de détection, de corrélation et de réponse aux incidents. Les environnements hybrides (on-premise, cloud, SaaS) génèrent un volume massif de journaux et d'événements qu'il est indispensable de centraliser et d'analyser.
 
-- **SIEM (Security Information and Event Management)** : collecte tous les logs, les corrèle, détecte les patterns bizarres
-- **SOAR (Security Orchestration Automated Response)** : automatise les réponses (isoler une machine, bloquer une IP, créer un ticket, etc.)
+Dans ce contexte, IBM QRadar constitue une solution SIEM de référence permettant :
 
-En gros, c'est ton "cerveau" du SOC. Et depuis poco, ils l'ont branchés à **Criminal IP**, une plateforme d'intelligence de menace basée sur l'IA.
-Ça veut dire que QRadar reçoit maintenant des infos sur les IPs malveillantes ET la surface d'attaque en temps quasi-réel. 
-Pas mal pour détecter plus vite les trucs chelous.
+- La centralisation des événements de sécurité
+- La corrélation en temps réel
+- La priorisation des incidents
+- L'aide à l'investigation
+- L'intégration avec des plateformes d'automatisation (SOAR)
 
-## Pourquoi c'est utile
+## 2. Présentation générale de la solution
 
-### Sans QRadar ou un SIEM
+### 2.1 Définition d'un SIEM
 
-Tu analyzes les logs manuellement = c'est l'enfer.
-Tu rates des patterns. Les attaquants se marrent.
+Un SIEM (Security Information and Event Management) est une plateforme qui :
 
-### Avec QRadar
+- Collecte les logs
+- Normalise les données
+- Corrèle les événements
+- Génère des alertes consolidées
+- Fournit des capacités d'investigation
 
-- Les logs sont centralisés dans une seule place (hallelujah !)
-- Les corrélations se font toutes seules
-- Les alertes sont triées par priorité (vraiment utile d'avoir moins de faux positifs)
-- Les playbooks d'automatisation répondent instantanément
-- Tu as un historique et une timeline de tout ce qui se passe
+### 2.2 Positionnement de QRadar
 
-## L'intégration Criminal IP : c'est quoi le truc ?
+IBM QRadar est conçu pour :
 
-Avant : QRadar voyait une connexion vers une IP bizarre. "Hmmm, suspicious."
+- Les SOC (Security Operations Centers)
+- Les grandes entreprises
+- Les environnements critiques
+- Les architectures distribuées
 
-Maintenant avec Criminal IP : QRadar voit la même connexion + obtient immédiatement :
-- L'historique de cette IP (c'est une adresse de botnet connu ?)
-- La surface d'attaque associée (y a des ports ouverts dangereux ?)
-- Les services accessibles (est-ce que c'est une machine compromise ?)
-- Les risques détectés par l'IA (score de dangerosité)
+La solution peut être déployée :
 
-**Résultat** : tu réagis plus rapidement, tu bloques l'IP vite, tu évites une infection.
+- Sur appliance physique certifiée
+- En machine virtuelle
+- En mode SaaS (QRadar on Cloud)
 
-## Fonctionnalités principales
+## 3. Architecture technique de QRadar
 
-### Collecte centralisée
+### 3.1 Composants principaux
 
-QRadar reçoit les données de :
-- Firewalls (Palo Alto, Fortinet, Checkpoint, etc.)
-- Serveurs Windows et Linux
-- Antivirus et EDR
-- Proxies
-- Équipements réseau
-- APIs et connecteurs custom
+Les composants officiellement documentés sont :
 
-### Corrélation des événements
+- Console
+- Event Collector
+- Event Processor
+- Flow Collector
+- Flow Processor
+- Data Node
 
-QRadar dit : "Tiens, un login échoué sur le serveur SQL, puis 5 minutes après une tentative de reconnaissance réseau, puis une exfiltration de données."
-C'est pas juste 3 events random, c'est une **attaque en cours**.
+### 3.2 Schéma d'architecture (Architecture distribuée)
 
-### Détection des anomalies
+```
+                    ┌─────────────────────┐
+                    │   Sources Log       │
+                    ├─────────────────────┤
+                    │ • Firewalls         │
+                    │ • Serveurs Windows  │
+                    │ • Linux             │
+                    │ • IDS/IPS           │
+                    │ • Applications      │
+                    └──────────┬──────────┘
+                               │
+                               ▼
+                    ┌──────────────────────┐
+                    │  Event Collector     │
+                    │                      │
+                    └──────────┬───────────┘
+                               │
+                               ▼
+                    ┌──────────────────────┐
+                    │  Event Processor     │
+                    │ (Moteur Corrélation) │
+                    └──────────┬───────────┘
+                               │
+                               ▼
+                    ┌──────────────────────┐
+                    │   Data Nodes         │
+                    │  (Stockage Événements)
+                    └──────────┬───────────┘
+                               │
+                               ▼
+                    ┌──────────────────────┐
+                    │      Console         │
+                    │ Interface Analyste   │
+                    └──────────────────────┘
+```
 
-Avec l'IA et l'apprentissage machine, QRadar apprend ce qui est "normal" dans ton réseau.
-Quand quelque chose s'écarte du pattern habituel, bing ! Alerte.
+### 3.3 Flux réseau (Flow Processing)
 
-### Dashboards et rapports
+```
+Sources NetFlow / sFlow
+           │
+           ▼
+    Flow Collector
+           │
+           ▼
+    Flow Processor
+           │
+           ▼
+    Data Storage
+```
 
-Tu veux voir :
-- Les incidents du jour ?
-- Les IPs les plus malveillantes ?
-- Les utilisateurs suspects ?
-- La posture de sécurité globale ?
+## 4. Fonctionnement interne du moteur SIEM
 
-C'est customizable et ça update en temps réel.
+### 4.1 Collecte
 
-### Playbooks d'automatisation
+Protocoles supportés :
 
-Au lieu de faire ça manuellement à chaque fois :
-1. Voir l'alerte
-2. Vérifier les logs
-3. Escalader si confirmé
-4. Bloquer l'IP
-5. Isoler la machine
-6. Creer un ticket incident
+- Syslog
+- SNMP
+- JDBC
+- API REST
+- Log File
+- WinCollect (Windows)
 
-Tu définis une règle une fois, et QRadar la réexécute sur chaque incident similaire. Gain de temps énorme.
+### 4.2 Normalisation – DSM
 
-## Utilisation basique (en CLI ou API)
+Les Device Support Modules (DSM) assurent :
 
-### Déploiement avec Docker (démo rapide)
+- L'identification du type de log
+- L'extraction des champs normalisés
+- La catégorisation (Log Source Type)
+
+### 4.3 Corrélation
+
+Le moteur applique :
+
+- Règles basées sur conditions
+- Corrélation multi-événements
+- Seuils temporels
+- Analyse comportementale
+
+La corrélation produit une Offense.
+
+### 4.4 Calcul de la magnitude
+
+**Magnitude = fonction de :**
+
+- Relevance
+- Severity
+- Credibility
+
+## 5. Installation officielle (Processus académique)
+
+**QRadar doit être installé via ISO IBM officiel.**
+
+### 5.1 Démarrage installation
+
+Boot sur ISO :
+
+- Install IBM QRadar
+
+### 5.2 Configuration réseau
+
+Après installation :
 
 ```bash
-docker run -d -e ACCEPT_EULA=true \
-  -p 8080:8080 \
-  -p 443:443 \
-  --name qradar-ce \
-  qradar-community-edition:latest
+nmtui
 ```
 
-Puis tu accèdes via `https://localhost`
+Configurer :
 
-### Connexion à l'API QRadar
+- Adresse IP statique
+- Gateway
+- DNS
+- Hostname
 
-QRadar expose une API REST pour :
-- Récupérer les incidents
-- Créer des offenses
-- Modifier les règles
-- Récupérer les logs
-
-Exemple simple en curl pour récupérer les offenses (incidents) :
+### 5.3 Vérification des services
 
 ```bash
-curl -k -H "SEC: <your-api-token>" \
-  https://your-qradar-instance/api/siem/offenses
+systemctl status hostcontext
+systemctl status ecs-ec
+systemctl status tomcat
 ```
 
-En Python (plus facile) :
+### 5.4 Redémarrage complet des services
 
-```python
-import requests
-from requests.auth import HTTPBasicAuth
-
-BASE_URL = "https://your-qradar-instance/api/siem"
-HEADERS = {"SEC": "your-api-token"}
-
-# Récupérer les offenses
-response = requests.get(
-    f"{BASE_URL}/offenses",
-    headers=HEADERS,
-    verify=False
-)
-
-incidents = response.json()
-for incident in incidents:
-    print(f"[{incident['severity']}] {incident['description']}")
+```bash
+service hostcontext restart
 ```
 
-### Créer un log source (connecteur)
+## 6. Ajout d'une source Syslog (exemple)
 
-Pour que QRadar reçoive les logs d'une source :
-
-1. Va dans **Admin** → **Log Sources**
-2. Clique sur **Add Log Source**
-3. Choisis le type (Syslog, Windows Event Log, SNMP, etc.)
-4. Configure l'IP/hostname et le port
-5. Sélectionne les parsers appropriés
-6. Sauvegarde
-
-QRadar commencera à collecter les logs après 5-10 min.
-
-### Créer une règle simple
+Configuration côté firewall :
 
 ```
-# Exemple : Alerter si 10 tentatives de login échouées en 5 minutes
-
-Rule: Multiple Failed Logins
-Source: Windows Event Log (Event ID 4625)
-Condition: COUNT > 10 in 5 minutes
-Action: Create Offense with severity HIGH
+logging host 192.168.10.50
+logging trap informational
 ```
 
-Tu peux le faire en UI ou via la CLI avec des scripts.
+Dans QRadar :
 
-## Intégration Criminal IP
+- Admin → Log Sources → Add Log Source
+- Type : Syslog
+- Protocol : UDP/TCP
 
-Pour activer l'enrichissement Criminal IP :
+## 7. QRadar SOAR
 
-1. Va dans **Admin** → **Data Sources** → **Threat Intelligence**
-2. Ajoute Criminal IP comme source
-3. Configure ta clé API Criminal IP
-4. Active la corrélation automatique
+### IBM QRadar SOAR
 
-Ensuite, chaque fois qu'une IP suspecte est détectée :
-- QRadar fetch les infos Criminal IP
-- Enrichit l'incident avec le contexte d'IA
-- Augmente le score de sévérité si nécessaire
-- Déclenche des playbooks adaptés
+Produit distinct intégré via API.
 
-## Cas d'usage concrets
+**Fonctions principales :**
 
-### Détection d'une exfiltration
+- Gestion des incidents
+- Playbooks automatisés
+- Orchestration multi-outils
+- Gestion des tickets
 
-1. Quelqu'un télécharge 50GB vers une IP inconnue
-2. QRadar détecte l'anomalie (faux normalement ?!)
-3. Criminal IP dit que c'est une adresse C2 known
-4. Un playbook se trigger automatiquement :
-   - L'IP est bloquée au firewall
-   - L'utilisateur est isolé du réseau
-   - Un ticket incident est créé
-   - L'équipe SOC est alertée
-5. Tu as 5 min pour réagir avant que l'attaquant se casse
+### 7.1 Schéma SIEM + SOAR
 
-### Détection d'une compromission interne
+```
+Detection (SIEM)
+       │
+       ▼
+   Offense
+       │
+       ▼
+SOAR Playbook
+       │
+       ▼
+Automated Actions
+(Block IP / Ticket / Alert)
+```
 
-1. Un serveur commence à faire des scans de port sur le réseau (c'est pas normal)
-2. Il contacte une IP malveillante (Criminal IP le confirme)
-3. QRadar corrèle : c'est pas un accident, c'est une attaque
-4. Le serveur est isolé automatiquement
-5. Un scan forensique est lancé
+## 8. Intégration Threat Intelligence
 
-### Audit de conformité
+QRadar supporte :
 
-Tu dois prouver que tu logs tout et que tu réagis aux incidents ?
-QRadar génère des rapports :
-- Tous les events sont loggés
-- Les alertes sont tracées
-- Les réponses automatisées sont documentées
-- Parfait pour PCI-DSS, ISO 27001, etc.
+- STIX/TAXII
+- REST API
+- Feeds externes
 
-## Les limites (soyons honnêtes)
+## 9. Intégration IP Reputation – Criminal IP
 
-- **Chère** : QRadar coûte cher (compter 50k€+ par an facilement)
-- **Complexe** : Faut du temps pour bien la configurer
-- **Faux positifs** : Même avec l'IA, tu peux avoir du bruit
-- **Dépendance** : Si QRadar tombe, t'es blind sur la sécurité
-- **Ingestion de logs** : Faut de la bande passante et du stockage
+### 9.1 Principe
 
-## Alternatives
+Criminal IP est une plateforme externe fournissant :
 
-Si QRadar c'est trop cher ou trop complex pour toi :
+- Score de réputation IP
+- Historique d'activités malveillantes
+- Données OSINT
 
-- **Splunk** : Plus flexible, moins "vendeur"
-- **ELK Stack** : Open source et gratuit
-- **Wazuh** : Vraiment simpa pour les petites structures
-- **Elastic Security** : Bon compromise coût/perf
-- **Azure Sentinel** : Si t'es dans l'écosystème Microsoft
+L'intégration se fait via API REST.
 
-## Tips pratiques du SOC
+### 9.2 Exemple d'appel API
 
-1. **Commencer petit** : Active pas toutes les règles d'un coup, tu vas être submergé
-2. **Tuner les seuils** : Ajuste les seuils pour réduire les faux positifs
-3. **Documenter tes playbooks** : Sinon après t'oublies pourquoi tu as fait tel truc
-4. **Utiliser l'enrichissement Criminal IP** : C'est la mise à jour qui change vraiment le game
-5. **Faire des tests reguliers** : Lance des tests d'attaque pour valider que tout marche
-6. **Former l'équipe** : Un SIEM utilisé par des gens qui comprennent rien, c'est inutile
+```bash
+curl -X GET https://api.criminalip.io/v1/ip/8.8.8.8 \
+-H "x-api-key: VOTRE_CLE_API"
+```
 
-## Conclusion
+### 9.3 Intégration dans QRadar
 
-QRadar est une bête de guerre dans le monde SIEM/SOAR. 
-Pas la meilleure pour tous, mais si tu dois traiter des milliers d'events par seconde et que tu veux automatiser ta réponse aux incidents, c'est un choix solide.
-L'intégration Criminal IP est la cerise sur le gâteau pour détecter les menaces plus vite.
+**Méthodes :**
 
-Et voilà, tu as maintenant un SOC moins chaotique. Enjoy ! 🔒
+- Script d'enrichissement
+- Application App Exchange
+- Intégration dans un playbook SOAR
 
----
+## 10. Workflow complet SOC
 
-**Sources utiles** :
-- [Doc officielle QRadar](https://www.ibm.com/docs/en/qradar-on-cloud)
-- [API QRadar](https://www.ibm.com/docs/en/qradar-on-cloud?topic=apis-qradar-rest-api)
-- [Criminal IP Platform](https://www.criminalip.io/)
+```
+Connexion suspecte détectée
+           │
+           ▼
+    Règle déclenchée
+           │
+           ▼
+    Offense générée
+           │
+           ▼
+  Enrichissement IP via API
+           │
+    ┌──────┴──────┐
+    │             │
+    ▼             ▼
+Score critique  Score faible
+    │
+    ▼
+Blocage firewall
+Création ticket
+Notification analyste
+```
+
+## 11. Administration système
+
+**Vérifier espace disque**
+
+```bash
+df -h
+```
+
+**Vérifier performances**
+
+```bash
+top
+```
+
+**Logs QRadar**
+
+```
+/var/log/qradar.log
+```
+
+## 12. Bonnes pratiques académiques
+
+- Dimensionnement selon EPS
+- Séparation Console / Processor en production
+- Test en environnement LAB
+- Mise à jour via Fix Packs officiels
+- Sauvegarde régulière
+
+## 13. Conclusion
+
+IBM QRadar constitue :
+
+- Une plateforme SIEM robuste
+- Un moteur de corrélation avancé
+- Une solution adaptée aux SOC modernes
+
+L'intégration avec QRadar SOAR permet :
+
+- L'automatisation
+- L'orchestration
+- La réponse structurée
+
+L'ajout d'une source externe telle que Criminal IP :
+
+- Améliore l'enrichissement contextuel
+- Renforce la priorisation
+- Accélère l'investigation
